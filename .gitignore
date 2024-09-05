@@ -5,3 +5,4 @@ appsettings.json
 bin/Debug/net6.0/InternalTrace.*.log
 Features/*.feature.cs
 Reports/*.csv
+Records/*.mp4
