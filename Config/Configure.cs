@@ -10,5 +10,8 @@
         public static readonly String MYQ_PASSWORD = AppSettings.get("MyQ_App:Password");
         public static readonly String WIFI_NAME_PROVISIONING = "MyQ-102";
         public const int SELENIUM_WAIT_TIMEOUT = 20; //[s]
+
+        public static readonly String WIFI_USERNAME = AppSettings.get("Network:Username");
+        public static readonly String WIFI_PASSWORD = AppSettings.get("Network:Password");
     }
 }

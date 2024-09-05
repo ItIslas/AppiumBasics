@@ -15,6 +15,7 @@ using OpenQA.Selenium.Appium.Android;
 using OpenQA.Selenium.Remote;
 using TechTalk.SpecFlow.Time;
 using OpenQA.Selenium;
+using System.Collections;
 
 namespace AppiumExercises.StepDefinitions
 {
@@ -27,6 +28,27 @@ namespace AppiumExercises.StepDefinitions
         By passField = By.XPath("//android.widget.EditText[@resource-id=\"login-password\"]");
         By tmpUsernameField = By.XPath("//android.view.View[@text=\"Email\"]");
         By loginBttn = By.XPath("//android.widget.Button[@resource-id=\"submit_button\"]");
+        By addDevice = By.XPath("//android.widget.ImageButton[@content-desc=\"Añadir nuevo\"]");
+        By device = By.XPath("//android.widget.TextView[@resource-id=\"com.chamberlain.android.liftmaster.myq:id/menuDevice\"]");
+        By accessory = By.XPath("(//android.widget.ImageView[@resource-id=\"com.chamberlain.android.liftmaster.myq:id/device_category_list_item_img_device\"])[2]");
+        By videoKeypad = By.XPath("(//android.widget.FrameLayout[@resource-id=\"com.chamberlain.android.liftmaster.myq:id/layout_setup_device_type\"])[1]/android.view.ViewGroup");
+        //By yesBtn = By.XPath("//android.widget.Button[@resource-id=\"com.chamberlain.android.liftmaster.myq:id/button_setup_next\"]");
+        By differentGdo = By.XPath("//android.widget.Button[@resource-id=\"com.chamberlain.android.liftmaster.myq:id/setup_select_gdo_btn_connect_different_gdo\"]");
+        By wifiChB = By.XPath("//android.widget.CheckBox[@resource-id=\"com.chamberlain.android.liftmaster.myq:id/wifi_row_check_box\"]");
+        By passChB = By.XPath("//android.widget.CheckBox[@resource-id=\"com.chamberlain.android.liftmaster.myq:id/wifi_password_row_check_box\"]");
+        By ladderChB = By.XPath("//android.widget.CheckBox[@resource-id=\"com.chamberlain.android.liftmaster.myq:id/ladder_row_check_box\"]");
+        By bluetoothChB = By.XPath("//android.widget.CheckBox[@resource-id=\"com.chamberlain.android.liftmaster.myq:id/bluetooth_row_check_box\"]");
+        By vkpChB = By.XPath("//android.widget.CheckBox[@resource-id=\"com.chamberlain.android.liftmaster.myq:id/vkp_row_check_box\"]");
+        By readyBtn = By.XPath("//android.widget.Button[@resource-id=\"com.chamberlain.android.liftmaster.myq:id/button_ready\"]");
+        By nextBtn = By.XPath("//android.widget.Button[@resource-id=\"com.chamberlain.android.liftmaster.myq:id/button_setup_next\"]");
+        By deviceSelected = By.XPath("//android.widget.TextView[@resource-id=\"com.chamberlain.android.liftmaster.myq:id/text_device_label\"]");
+        By vincular = By.XPath("//android.widget.Button[@resource-id=\"android:id/button1\"]");
+        By network = By.XPath("//android.widget.TextView[@resource-id=\"com.chamberlain.android.liftmaster.myq:id/network_name\" and @text=\"" + "TAG_Network" + "\"]");
+        By passNetwork = By.XPath("//android.widget.EditText[@resource-id=\"com.chamberlain.android.liftmaster.myq:id/edit_network_password\"]");
+        By nexttBtn = By.XPath("//android.widget.Button[@resource-id=\"com.chamberlain.android.liftmaster.myq:id/button_next\"]");
+        By connectedText = By.XPath("//android.widget.ImageView[@resource-id=\"com.chamberlain.android.liftmaster.myq:id/image_setup_device_state\"]");
+
+
 
         protected readonly ScenarioContext _scenarioContext;
         public AppiumSteps(ScenarioContext scenarioContext)
@@ -70,7 +92,6 @@ namespace AppiumExercises.StepDefinitions
 
             appDriver = new AndroidDriver(new Uri("http://127.0.0.1:4723/wd/hub"), driverOptions);
             wait = new WebDriverWait(appDriver, TimeSpan.FromSeconds(Configure.SELENIUM_WAIT_TIMEOUT));
-
         }
 
         [Given(@"I open wifi network avaiable")]
@@ -105,6 +126,48 @@ namespace AppiumExercises.StepDefinitions
             appDriver.FindElement(loginBttn).Click(); 
         }
 
+        [Then(@"I add a device")]
+        public void ThenIClickOnAddADevice()
+        {
+            waitAndClick(addDevice);
+            waitAndClick(device);
+            waitAndClick(accessory);
+            waitAndClick(videoKeypad);
+            waitAndClick(nextBtn);
+            waitAndClick(differentGdo);
+            waitAndClick(wifiChB);
+            appDriver.FindElement(passChB).Click();
+            appDriver.FindElement(ladderChB).Click();
+            appDriver.FindElement(bluetoothChB).Click();
+            appDriver.FindElement(vkpChB).Click();
+            waitAndClick(readyBtn);
+            waitAndClick(nextBtn);
+            waitAndClick(nextBtn);
+            waitAndClick(deviceSelected);
+            waitAndClick(vincular);
+            waitAndClick(network);
+            appDriver.FindElement(passNetwork).SendKeys(Configure.WIFI_PASSWORD);
+            waitAndClick(nexttBtn);
+            wait.Until(ExpectedConditions.ElementExists(connectedText));
+        }
+
+        [Then(@"I start the recording")]
+        public void ThenIStartTheRecording()
+        {
+            appDriver.StartRecordingScreen();
+        }
+        
+        [Then(@"I stop the recording")]
+        public void ThenIStopTheRecording()
+        {
+            string base64Video = appDriver.StopRecordingScreen();
+            byte[] videoBytes = Convert.FromBase64String(base64Video);
+
+            string filePath = Configure.PROJ_DIRECTORY + @"\Records\sample.mp4";
+            File.WriteAllBytes(filePath, videoBytes);
+            Console.WriteLine($"Video saved to {filePath}");
+        }
+
         public void OpenWifiList()
         {
             appDriver.StartActivity("com.android.settings", "com.android.settings.Settings$NetworkProviderSettingsActivity");
@@ -113,6 +176,12 @@ namespace AppiumExercises.StepDefinitions
         public void OpenChrome()
         {
             appDriver.StartActivity("com.android.chrome", "com.google.android.apps.chrome.Main");
+        }
+
+        public void waitAndClick(By element)
+        {
+            wait.Until(ExpectedConditions.ElementExists(element));
+            appDriver.FindElement(element).Click();
         }
 
     }
